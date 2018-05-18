@@ -17,16 +17,43 @@ float sdSphere( vec3 p, float s )
     return length(p)-s;
 }
 
+
 float udRoundBox( vec3 p, vec3 b, float r )
 {
     return length(max(abs(p)-b,0.0))-r;
 }
 
+float sdf_smin(float a, float b, float k)
+{
+	float res = exp(-k*a) + exp(-k*b);
+	return -log(max(0.0001,res)) / k;
+}
+
+vec2 opU( vec2 d1, vec2 d2 )
+{
+	return (d1.x<d2.x) ? d1 : d2;
+}
+
+
+vec3 opRep( vec3 p, vec3 c )
+{
+    return mod(p, c) - (0.5 * c);
+}
+
+
 vec2 map( in vec3 pos )
 {
-    vec2 res = vec2(udRoundBox(pos-vec3( 0.0, 0.5, 0.0), vec3(0.5), 0.01 ), 0.5);
+
+    float box = udRoundBox( pos - vec3(-0.5,0.5,0.0), vec3(0.5), 0.01 );
+    float sphere = sdSphere( pos - vec3( 0.5, 0.5 + sin(u_time) * 0.5, 0.0), 0.5 );
+    vec2 res = vec2( sdf_smin(box, sphere, 8.), 0.5);
+
+    // vec2 res = vec2( udRoundBox( opRep( pos - vec3(0.0,0.5,0.0), vec3(1.1,0.0,1.1) ), vec3(0.5), 0.01 ), 0.5);
+
+    // res = opU( res, vec2(sdSphere( pos-vec3( 0.5, 0.5, 0.0), 0.5 ), 0.5 ));
     return res;
 }
+
 
 
 vec3 calcNormal( in vec3 pos )
@@ -45,7 +72,7 @@ vec2 castRay( in vec3 ro, in vec3 rd )
     float tmin = 1.0;
     float tmax = 20.0;
    
-#if 1
+#if 0
     // bounding volume
     float tp1 = (0.0-ro.y)/rd.y; if( tp1>0.0 ) tmax = min( tmax, tp1 );
     float tp2 = (1.6-ro.y)/rd.y; if( tp2>0.0 ) { if( ro.y>1.6 ) tmin = max( tmin, tp2 );
@@ -71,9 +98,10 @@ vec2 castRay( in vec3 ro, in vec3 rd )
 vec3 render( in vec3 ro, in vec3 rd )
 { 
     vec3 col = vec3(0.7, 0.9, 1.0) + rd.y * 0.8;
-    vec2 res = castRay(ro,rd);
+    vec2 res = castRay(ro, rd);
     float t = res.x;
 	float m = res.y;
+
     if( m>-0.5 )
     {
         vec3 pos = ro + t*rd;
@@ -138,9 +166,9 @@ void main() {
 
     vec2 p = (-u_resolution.xy + 2.0*gl_FragCoord.xy)/u_resolution.y;
 
-    // camera	
-    vec3 ro = vec3( -0.5+3.5*cos(0.1*time + 6.0*mo.x), 1.0 + 2.0*mo.y, 0.5 + 4.0*sin(0.1*time + 1.0*mo.x) );
-    vec3 ta = vec3( -0.0, -0.0, 0.0 ); // look at point
+    // camera (ray origin)
+    vec3 ro = vec3( -0.5+3.5*cos(0.1*time + 6.0*mo.x), 1.0 + 3.0, 0.5 + 4.0 );
+    vec3 ta = vec3( 0.0, 0.0, 0.0 ); // look at point
     // camera-to-world transformation
     mat3 ca = setCamera( ro, ta, 0.0 );
     // ray direction
