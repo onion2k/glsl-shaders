@@ -2,14 +2,13 @@
 // Copyright © 2013 Inigo Quilez
 // Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions: The above copyright notice and this permission notice shall be included in all copies or substantial portions of the Software. THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
     
-#extension GL_OES_standard_derivatives : enable
-
 // A list of useful distance function to simple primitives, and an example on how to 
 // do some interesting boolean operations, repetition and displacement.
 //
 // More info here: http://www.iquilezles.org/www/articles/distfunctions/distfunctions.htm
 
 #define AA 1   // make this 1 is your machine is too slow
+#extension GL_OES_standard_derivatives : enable
 
 precision mediump float;
 
@@ -367,12 +366,11 @@ mat3 setCamera( in vec3 ro, in vec3 ta, float cr )
     return mat3( cu, cv, cw );
 }
 
-void mainImage( out vec4 fragColor, in vec2 fragCoord )
+void main()
 {
     vec2 mo = u_mouse.xy/u_resolution.xy;
 	float time = 15.0 + u_time;
 
-    
     vec3 tot = vec3(0.0);
 #if AA>1
     for( int m=0; m<AA; m++ )
@@ -380,9 +378,9 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
     {
         // pixel coordinates
         vec2 o = vec2(float(m),float(n)) / float(AA) - 0.5;
-        vec2 p = (-u_resolution.xy + 2.0*(fragCoord+o))/u_resolution.y;
+        vec2 p = (-u_resolution.xy + 2.0*(gl_FragCoord+o))/u_resolution.y;
 #else    
-        vec2 p = (-u_resolution.xy + 2.0*fragCoord)/u_resolution.y;
+        vec2 p = (-u_resolution.xy + 2.0*gl_FragCoord.xy)/u_resolution.y;
 #endif
 
 		// camera	
@@ -406,5 +404,5 @@ void mainImage( out vec4 fragColor, in vec2 fragCoord )
 #endif
 
     
-    fragColor = vec4( tot, 1.0 );
+    gl_FragColor = vec4( tot, 1.0 );
 }
