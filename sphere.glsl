@@ -1,4 +1,6 @@
 
+#extension GL_OES_standard_derivatives : enable
+
 precision mediump float;
 
 uniform vec2      u_resolution;           // viewport resolution (in pixels)
@@ -41,13 +43,13 @@ vec3 opRep( vec3 p, vec3 c )
 vec2 map( in vec3 pos )
 {
 
-    float box = udRoundBox( pos - vec3(0.0,0.5,0.0), vec3(0.5), 0.01 );
-    float sphere1 = sdSphere( pos - vec3( 0.75 - sin(u_time)*0.25, 0.5, 0.0), 0.4 );
-    float sphere2 = sdSphere( pos - vec3( -0.75 + sin(u_time)*0.25, 0.5, 0.0), 0.4 );
-    float sphere3 = sdSphere( pos - vec3(  0.0, 0.5, 0.75 - sin(u_time)*0.25), 0.4 );
-    float sphere4 = sdSphere( pos - vec3(  0.0, 0.5, -0.75 + sin(u_time)*0.25), 0.4 );
-    float sphere5 = sdSphere( pos - vec3(  0.0, 1.25 - sin(u_time)*0.25, 0.0), 0.4 );
-    float sphere6 = sdSphere( pos - vec3(  0.0, -0.25 + sin(u_time)*0.25, 0.0), 0.4 );
+    float box = sdSphere( pos - vec3(0.0,0.0,0.0), 0.75 );
+    float sphere1 = sdSphere( pos - vec3( 0.5 - sin(u_time)*0.25, 0.5 - cos(u_time)*0.25, 0.0), 0.5 );
+    float sphere2 = sdSphere( pos - vec3( -0.5 + sin(u_time)*0.25, 0.5 + cos(u_time)*0.25, 0.0), 0.5 );
+    float sphere3 = sdSphere( pos - vec3(  0.0, 0.5 - cos(u_time)*0.25, 0.5 - sin(u_time)*0.25), 0.5 );
+    float sphere4 = sdSphere( pos - vec3(  0.0, 0.5 + cos(u_time)*0.25, -0.5 + sin(u_time)*0.25), 0.5 );
+    float sphere5 = sdSphere( pos - vec3(  0.0 - cos(u_time)*0.25, 0.5 - sin(u_time)*0.25, 0.0), 0.5 );
+    float sphere6 = sdSphere( pos - vec3(  0.0 + cos(u_time)*0.25, -0.5 + sin(u_time)*0.25, 0.0), 0.5 );
 
     float c = sdf_smin(box, sphere1, 8.);
         c = c = sdf_smin(c, sphere2, 8.);
@@ -114,14 +116,25 @@ vec3 render( in vec3 ro, in vec3 rd )
     float t = res.x;
 	float m = res.y;
 
-    if( m>-0.5 )
+    if( m>0.0 )
     {
-        vec3 pos = ro + t*rd;
+        vec3 pos = ro + t * rd;
         vec3 nor = calcNormal( pos );
         vec3 ref = reflect( rd, nor );
         
         // material
-		col = 0.45 + 0.35 * sin( vec3(0.75,0.08,0.10) * (m-1.0) );
+		// col = 0.45 + 0.35 * sin( vec3(0.75,0.08,0.10) * (m-1.0) );
+
+        float x = res.x;
+
+        if (x - 2.0 * floor(x * 0.5) == 1.0) {
+            x = 0.1;
+        } else {
+            x = 1.0;
+        }
+
+        col = vec3(x, 0.0, 0.0);
+
 
         // if( m<1.5 )
         // {
@@ -131,9 +144,9 @@ vec3 render( in vec3 ro, in vec3 rd )
 
         // lighitng        
         // float occ = calcAO( pos, nor );
-		vec3  lig = normalize( vec3(-0.4, 0.7, -0.6) );
+		vec3  lig = normalize( vec3(-0.7, 0.1, -0.7) );
         vec3  hal = normalize( lig-rd );
-		float amb = clamp( 0.5+0.5*nor.y, 0.0, 1.0 );
+		float amb = clamp( 0.2+0.5*nor.y, 0.0, 1.0 );
         float dif = clamp( dot( nor, lig ), 0.0, 1.0 );
         float bac = clamp( dot( nor, normalize(vec3(-lig.x,0.0,-lig.z))), 0.0, 1.0 )*clamp( 1.0-pos.y,0.0,1.0);
         float dom = smoothstep( -0.1, 0.1, ref.y );
@@ -142,7 +155,7 @@ vec3 render( in vec3 ro, in vec3 rd )
         // dif *= calcSoftshadow( pos, lig, 0.02, 2.5 );
         // dom *= calcSoftshadow( pos, ref, 0.02, 2.5 );
 
-		float spe = pow( clamp( dot( nor, hal ), 0.0, 1.0 ),16.0)*
+		float spe = pow( clamp( dot( nor, hal ), 0.0, 1.0 ),32.0)*
                     dif *
                     (0.04 + 0.96*pow( clamp(1.0+dot(hal,rd),0.0,1.0), 5.0 ));
 
@@ -153,7 +166,7 @@ vec3 render( in vec3 ro, in vec3 rd )
         lin += 0.50*bac*vec3(0.25,0.25,0.25);
         lin += 0.25*fre*vec3(1.00,1.00,1.00);
 		col = col*lin;
-		col += 10.00*spe*vec3(1.00,0.90,0.70);
+		col += 50.00*spe*vec3(1.00,0.90,0.70);
 
     	col = mix( col, vec3(0.8,0.9,1.0), 1.0-exp( -0.0002*t*t*t ) );
     }
