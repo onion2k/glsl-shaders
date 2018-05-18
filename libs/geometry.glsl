@@ -24,7 +24,6 @@ float udRoundBox( vec3 p, vec3 b, float r )
 {
     return length(max(abs(p)-b,0.0))-r;
 }
-
 float sdTorus( vec3 p, vec2 t )
 {
     return length( vec2(length(p.xz)-t.x,p.y) )-t.y;
@@ -97,7 +96,7 @@ float sdConeSection( in vec3 p, in float h, in float r1, in float r2 )
     return length(max(vec2(d1,d2),0.0)) + min(max(d1,d2), 0.);
 }
 
-float sdPryamid4(vec3 p, vec3 h ) // h = { cos a, sin a, height }
+float sdPyramid4(vec3 p, vec3 h ) // h = { cos a, sin a, height }
 {
     // Tetrahedron = Octahedron - Cube
     float box = sdBox( p - vec3(0,-2.0*h.z,0), vec3(2.0*h.z) );
@@ -109,21 +108,4 @@ float sdPryamid4(vec3 p, vec3 h ) // h = { cos a, sin a, height }
     d = max( d, abs( dot(p, vec3(  0, h.y,-h.x )) ));
     float octa = d - h.z;
     return max(-box,octa); // Subtraction
-}
-
-float sdTorus82( vec3 p, vec2 t )
-{
-    vec2 q = vec2(length2(p.xz)-t.x,p.y);
-    return length8(q)-t.y;
-}
-
-float sdTorus88( vec3 p, vec2 t )
-{
-    vec2 q = vec2(length8(p.xz)-t.x,p.y);
-    return length8(q)-t.y;
-}
-
-float sdCylinder6( vec3 p, vec2 h )
-{
-    return max( length6(p.xz)-h.x, abs(p.y)-h.y );
 }
