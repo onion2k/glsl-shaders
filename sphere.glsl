@@ -9,14 +9,12 @@ const int MAX_MARCHING_STEPS = 255;
 const float MIN_DIST = 0.0;
 const float MAX_DIST = 500.0;
 const float EPSILON = 0.0001;
-
-
+const float HALF_PI = 1.5707;
 
 float sdSphere( vec3 p, float s )
 {
     return length(p)-s;
 }
-
 
 float udRoundBox( vec3 p, vec3 b, float r )
 {
@@ -34,7 +32,6 @@ vec2 opU( vec2 d1, vec2 d2 )
 	return (d1.x<d2.x) ? d1 : d2;
 }
 
-
 vec3 opRep( vec3 p, vec3 c )
 {
     return mod(p, c) - (0.5 * c);
@@ -44,9 +41,24 @@ vec3 opRep( vec3 p, vec3 c )
 vec2 map( in vec3 pos )
 {
 
-    float box = udRoundBox( pos - vec3(-0.5,0.5,0.0), vec3(0.5), 0.01 );
-    float sphere = sdSphere( pos - vec3( 0.5, 0.5 + sin(u_time) * 0.5, 0.0), 0.5 );
-    vec2 res = vec2( sdf_smin(box, sphere, 8.), 0.5);
+    float box = udRoundBox( pos - vec3(0.0,0.5,0.0), vec3(0.5), 0.01 );
+    float sphere1 = sdSphere( pos - vec3( 0.75 - sin(u_time)*0.25, 0.5, 0.0), 0.4 );
+    float sphere2 = sdSphere( pos - vec3( -0.75 + sin(u_time)*0.25, 0.5, 0.0), 0.4 );
+    float sphere3 = sdSphere( pos - vec3(  0.0, 0.5, 0.75 - sin(u_time)*0.25), 0.4 );
+    float sphere4 = sdSphere( pos - vec3(  0.0, 0.5, -0.75 + sin(u_time)*0.25), 0.4 );
+    float sphere5 = sdSphere( pos - vec3(  0.0, 1.25 - sin(u_time)*0.25, 0.0), 0.4 );
+    float sphere6 = sdSphere( pos - vec3(  0.0, -0.25 + sin(u_time)*0.25, 0.0), 0.4 );
+
+    float c = sdf_smin(box, sphere1, 8.);
+        c = c = sdf_smin(c, sphere2, 8.);
+        c = c = sdf_smin(c, sphere3, 8.);
+        c = c = sdf_smin(c, sphere4, 8.);
+        c = c = sdf_smin(c, sphere5, 8.);
+        c = c = sdf_smin(c, sphere6, 8.);
+
+    vec2 res = vec2(
+        c
+    , 0.5);
 
     // vec2 res = vec2( udRoundBox( opRep( pos - vec3(0.0,0.5,0.0), vec3(1.1,0.0,1.1) ), vec3(0.5), 0.01 ), 0.5);
 
