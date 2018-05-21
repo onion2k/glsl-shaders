@@ -123,17 +123,14 @@ vec3 render( in vec3 ro, in vec3 rd )
         vec3 ref = reflect( rd, nor );
         
         // material
-		// col = 0.45 + 0.35 * sin( vec3(0.75,0.08,0.10) * (m-1.0) );
 
-        float x = res.x;
+        float r = mod(pos.x, 0.5);
 
-        if (x - 2.0 * floor(x * 0.5) == 1.0) {
-            x = 0.1;
+        if (r > 0.25) {
+            col = vec3(1.0, 1.0, 0.0);
         } else {
-            x = 1.0;
+            col = vec3(1.0, 0.0, 0.0);
         }
-
-        col = vec3(x, 0.0, 0.0);
 
 
         // if( m<1.5 )
