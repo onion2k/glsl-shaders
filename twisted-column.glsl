@@ -1,6 +1,12 @@
 
 #extension GL_OES_standard_derivatives : enable
 
+#define GRID_SIZE 0.20
+#define GRID_LINE_SIZE 1.25
+
+#define GRID_COLOR_1 vec3(0.00, 0.00, 0.00)
+#define GRID_COLOR_2 vec3(0.00, 0.90, 0.20)
+
 precision mediump float;
 
 uniform vec2      u_resolution;           // viewport resolution (in pixels)
@@ -18,32 +24,38 @@ float sdSphere( vec3 p, float s )
     return length(p)-s;
 }
 
+float sdBox( vec3 p, vec3 b )
+{
+    vec3 d = abs(p) - b;
+    return min(max(d.x,max(d.y,d.z)),0.0) + length(max(d,0.0));
+}
+
+float sdTorus( vec3 p, vec2 t )
+{
+    return length( vec2(length(p.xz)-t.x,p.y) )-t.y;
+}
+
 float sdf_smin(float a, float b, float k)
 {
 	float res = exp(-k*a) + exp(-k*b);
 	return -log(max(0.0001,res)) / k;
 }
 
+vec3 opTwist( vec3 p )
+{
+    float  c = cos(1.5*p.y+1.0);
+    float  s = sin(1.5*p.y+1.0);
+    mat2   m = mat2(c,-s,s,c);
+    return vec3(m*p.xz,p.y);
+}
+
 vec2 map( in vec3 pos )
 {
 
-    float box = sdSphere( pos - vec3(0.0,0.0,0.0), 0.75 );
-    float sphere1 = sdSphere( pos - vec3( 0.5 - sin(u_time)*0.25, 0.5 - cos(u_time)*0.25, 0.0), 0.5 );
-    float sphere2 = sdSphere( pos - vec3( -0.5 + sin(u_time)*0.25, 0.5 + cos(u_time)*0.25, 0.0), 0.5 );
-    float sphere3 = sdSphere( pos - vec3(  0.0, 0.5 - cos(u_time)*0.25, 0.5 - sin(u_time)*0.25), 0.5 );
-    float sphere4 = sdSphere( pos - vec3(  0.0, 0.5 + cos(u_time)*0.25, -0.5 + sin(u_time)*0.25), 0.5 );
-    float sphere5 = sdSphere( pos - vec3(  0.0 - cos(u_time)*0.25, 0.5 - sin(u_time)*0.25, 0.0), 0.5 );
-    float sphere6 = sdSphere( pos - vec3(  0.0 + cos(u_time)*0.25, -0.5 + sin(u_time)*0.25, 0.0), 0.5 );
-
-    float c = sdf_smin(box, sphere1, 8.);
-        c = c = sdf_smin(c, sphere2, 8.);
-        c = c = sdf_smin(c, sphere3, 8.);
-        c = c = sdf_smin(c, sphere4, 8.);
-        c = c = sdf_smin(c, sphere5, 8.);
-        c = c = sdf_smin(c, sphere6, 8.);
+    float box = sdBox( opTwist(pos - vec3(0.0,0.0,0.0)), vec3(0.5,0.5,1.5) );
 
     vec2 res = vec2(
-        c
+        box
     , 0.5);
 
     return res;
@@ -95,11 +107,13 @@ vec3 render( in vec3 ro, in vec3 rd )
 
         float r = mod(pos.x, 0.5);
 
-        if (r > 0.25) {
-            col = vec3(1.0, 1.0, 0.0);
-        } else {
-            col = vec3(1.0, 0.0, 0.0);
-        }
+        vec2 uv = abs(mod(pos.xy + GRID_SIZE/2.0, GRID_SIZE) - GRID_SIZE/2.0); 
+        
+        uv /= fwidth(pos.xy);
+        
+        float gln = min(uv.x, uv.y) / GRID_SIZE;
+        
+    	col = mix(GRID_COLOR_1, GRID_COLOR_2, 1.0 - smoothstep(0.0, GRID_LINE_SIZE / GRID_SIZE, gln));
 
 		vec3  lig = normalize( vec3(-0.7, 0.1, -0.7) );
         vec3  hal = normalize( lig-rd );
@@ -109,18 +123,18 @@ vec3 render( in vec3 ro, in vec3 rd )
         float dom = smoothstep( -0.1, 0.1, ref.y );
         float fre = pow( clamp(1.0+dot(nor,rd),0.0,1.0), 2.0 );
         
-		float spe = pow( clamp( dot( nor, hal ), 0.0, 1.0 ),32.0)*
+		float spe = pow( clamp( dot( nor, hal ), 0.0, 1.0 ), 32.0) *
                     dif *
-                    (0.04 + 0.96*pow( clamp(1.0+dot(hal,rd),0.0,1.0), 5.0 ));
+                    (0.01 + 0.50 * pow( clamp(1.0+dot(hal,rd),0.0,1.0), 0.6 ));
 
 		vec3 lin = vec3(0.0);
-        lin += 0.80*amb*vec3(0.40,0.40,0.40);
+        lin += 0.30*amb*vec3(0.20,0.20,0.20);
         lin += 0.50*bac*vec3(0.25,0.25,0.25);
-        lin += 0.25*fre*vec3(1.00,1.00,1.00);
-		col = col*lin;
-		col += 20.00*spe*vec3(1.00,0.90,0.70);
+        lin += 0.5*fre*vec3(0.5,0.5,0.5);
+		col = col * lin;
+		col += 50.00*spe*vec3(0.5,0.5,0.50);
 
-    	col = mix( col, vec3(0.8,0.9,1.0), 1.0-exp( -0.0002*t*t*t ) );
+    	col = mix( col, vec3(0.8,0.8,0.8), 1.0-exp( -0.0001*t*t*t ) );
     }
 
 	return vec3( clamp(col,0.0,1.0) );
