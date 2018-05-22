@@ -9,3 +9,4 @@ I use https://github.com/spite/ccapture.js/ to record the canvas to a webm video
 These are the things I've tried so far...
 
 * `ffmpeg -i <in> -c:v libx264 -preset veryslow -crf 10 <out>`
+* `ffmpeg -i <in> -c libx264 -movflags faststart -c libx264 <out>`
