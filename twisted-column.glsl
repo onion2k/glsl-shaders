@@ -11,7 +11,7 @@ precision mediump float;
 
 uniform vec2      u_resolution;           // viewport resolution (in pixels)
 uniform float     u_time;                 // shader playback time (in seconds)
-uniform vec2     u_mouse;                 // shader playback time (in seconds)
+uniform vec2      u_mouse;                 // shader playback time (in seconds)
 
 const int MAX_MARCHING_STEPS = 255;
 const float MIN_DIST = 0.0;
