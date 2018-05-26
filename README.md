@@ -10,3 +10,16 @@ These are the things I've tried so far...
 
 * `ffmpeg -i <in> -c:v libx264 -preset veryslow -crf 10 <out>`
 * `ffmpeg -i <in> -c libx264 -movflags faststart -c libx264 <out>`
+
+# Shaders
+
+Each of the glsl files in the lib directory is a part of a larger shader, and they won't work on their own. glsl doesn't have any sort of dependency system, so it's a cut'n'paste job to bring in the parts you need. Maybe one day I'll write a system for building them own of templates/lambda functions/whatever.
+
+# Uniforms
+
+These are (mostly) converted to use TWGL.js and it's standard uniforms.
+
+* u_time - float for the currrent time
+* u_resolution - vec2 of the screen resolution
+* u_mouse - vec2 of the screen space mouse coords
+* u_texture - a texture in RGBA as an INT8 array, wrapped and flipped
