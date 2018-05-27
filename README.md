@@ -23,3 +23,18 @@ These are (mostly) converted to use TWGL.js and it's standard uniforms.
 * u_resolution - vec2 of the screen resolution
 * u_mouse - vec2 of the screen space mouse coords
 * u_texture - a texture in RGBA as an INT8 array, wrapped and flipped
+
+# Textures
+
+TWGL.js has functions for loading a texture in to a uniform.
+
+```javascript
+let imgTex = twgl.createTexture(gl, {
+  src: 'https://source.unsplash.com/random/512x512',
+  crossOrigin: "",
+  mag: gl.NEAREST,
+  flipY: true
+});
+```
+
+The imgText var can then be passed to the shader in the uniforms object. 
