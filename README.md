@@ -38,3 +38,11 @@ let imgTex = twgl.createTexture(gl, {
 ```
 
 The imgText var can then be passed to the shader in the uniforms object. 
+
+# Things to learn
+
+* mix(), min(), max(), etc
+* clamp()
+* step(), smoothstep()
+* Signed distance fields
+* Particles (arrays?)
