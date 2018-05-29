@@ -46,3 +46,4 @@ The imgText var can then be passed to the shader in the uniforms object.
 * step(), smoothstep()
 * Signed distance fields
 * Particles (arrays?)
+* texture arrays
