@@ -48,3 +48,5 @@ The imgText var can then be passed to the shader in the uniforms object.
 * Particles (arrays?)
 * texture arrays
 * vertlet arrays for texture deformations
+* noise, perlin, simplex
+* geometry shaders
