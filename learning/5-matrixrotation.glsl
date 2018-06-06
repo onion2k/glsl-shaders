@@ -3,6 +3,7 @@ precision mediump float;
 uniform vec2 u_resolution;
 uniform float u_time;
 
+// A function that defines a 2d rotation matrix based on an input angle (in radians)
 mat2 rot2(float r){
   float c=cos(r), s=sin(r);
   return mat2(c, s, -s, c);
@@ -12,7 +13,8 @@ void main(void)
 {
     vec2 uv = gl_FragCoord.xy / u_resolution.y;
 
-    vec2 uvr = rot2(u_time) * (0.25 - uv);
+    // Take the screen space normalized vector and multiply it by a rotation matrix.
+    vec2 uvr = uv * rot2(u_time);
 
     float cb = floor(uvr.x * 10.0) + floor(uvr.y * 10.0);
 
