@@ -12,7 +12,7 @@
       // this we can interate a value based chunks of normalized coordinates; by multiplying
       // by a constant float of 50.0 the value of cb only changes once every 50 iterations of
       // uv.x and uv.y.
-      float cb = floor(uv.x * 50.) + floor(uv.y * 50.);
+      float cb = floor(uv.x * 10.) + floor(uv.y * 10.);
       
       // mod() is another built-in function. It returns the modulous of an input and a float.
       // This is a bit different to mod() in JavaScript as that takes an int. By using a mod()
