@@ -16,7 +16,8 @@ void main(void)
     // Take the screen space normalized vector and multiply it by a rotation matrix.
     // This rotates around the vector 0,0 which is the bottom left corner of the canvas.
     // We'll look at translation matrixes to move that next.
-    vec2 uvr = uv * rot2(u_time);
+    // (Note: 0.785 is pi/4, which is equal to 45 degrees in radians) 
+    vec2 uvr = uv * rot2(0.785);
 
     // The same checkerboard as before, but this time using our new rotated vector.
     float cb = floor(uvr.x * 10.0) + floor(uvr.y * 10.0);
