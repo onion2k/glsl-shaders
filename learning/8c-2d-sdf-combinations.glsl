@@ -1,1 +1,8 @@
 
+min()
+
+max()
+
+smin()
+
+mod()
