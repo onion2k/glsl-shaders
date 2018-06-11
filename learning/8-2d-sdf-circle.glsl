@@ -17,25 +17,24 @@
     #endif  
   }
 
-  float circle(in vec2 st) {
-    return dot(st,st);
+  float circle(in vec2 st, float radius) {
+    return length(st) - radius;
   }
 
-  vec2 repeat(vec2 dist) {
-    dist = dist - vec2(0.5); //center the pos
-    return mod(dist, 0.333) - 0.5 * 0.333;
+  vec2 repeat(vec2 dist, vec2 size) {
+    return mod(dist,size) - 0.5 * size;
   }
 
   void main(void)
   {
       vec2 uv = gl_FragCoord.xy / u_resolution;
-           uv.x *= u_resolution.x / u_resolution.y;
+          uv.x *= u_resolution.x / u_resolution.y;
 
-      uv = repeat(uv);
-      float c1 = max(0.0, circle(uv));
+      uv = repeat(uv, vec2(0.2, 0.25));
+      float c = circle(uv, 0.05);
 
-      c1 = aastep(0.025, c1);
+      c = aastep(0.025, c);
 
-      vec3 color = mix(vec3(0.0,0.0,0.0), vec3(1.0,1.0,1.0), c1);
+      vec3 color = mix(vec3(0.0,0.0,0.0), vec3(1.0,1.0,1.0), c);
       gl_FragColor = vec4(color, 1.0);
   }
