@@ -22,13 +22,14 @@
   }
 
   vec2 repeat(vec2 dist) {
-    dist = dist-vec2(0.5);
-    return mod(dist, 0.5) - 0.5 * 0.5;
+    dist = dist - vec2(0.5); //center the pos
+    return mod(dist, 0.333) - 0.5 * 0.333;
   }
 
   void main(void)
   {
       vec2 uv = gl_FragCoord.xy / u_resolution;
+           uv.x *= u_resolution.x / u_resolution.y;
 
       uv = repeat(uv);
       float c1 = max(0.0, circle(uv));
