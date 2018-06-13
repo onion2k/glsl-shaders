@@ -36,10 +36,10 @@ void main(void)
 
   uv = gl_FragCoord.xy / min(u_resolution.x, u_resolution.y);
   uv -= vec2(0.5,0.5);
-  uv  = repeat(uv - vec2(0.1, 0.125), vec2(0.5, 1.0));
-  float c2 = circle(uv, clamp(sin(u_time) * 0.5, 0.1, 0.5));
+  uv  = repeat(uv - vec2(0.125, 0.125), vec2(0.25, 0.25));
+  float c2 = circle(uv, clamp(sin(u_time) * 0.5, 0.025, 0.25));
 
-  float cc = max(c,c2);
+  float cc = min(c,c2);
 
   c = aastep(0.025, cc);
 
