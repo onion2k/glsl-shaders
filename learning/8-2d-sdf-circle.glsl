@@ -28,9 +28,7 @@ vec2 repeat(vec2 dist, vec2 size) {
 void main(void)
 {
   vec2 uv = gl_FragCoord.xy / min(u_resolution.x, u_resolution.y);
-      // uv.x *= u_resolution.x / u_resolution.y;
 
-  // uv -= vec2(0.5,0.5);
   uv  = repeat(uv, vec2(0.25, 0.25));
   float c = circle(uv, 0.05);
 
