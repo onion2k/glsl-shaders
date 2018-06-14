@@ -46,17 +46,21 @@ void main(void)
 
   uv *= rot2(0.785);
   uv  = repeat(uv, vec2(4.0, 4.0));
-  float c = square(uv, vec2(0.8, 0.5));
+  float x = 0.5;
+  float y = 0.25 + abs(sin(u_time) * 0.25);
+  float c = square(uv, vec2(x, y));
 
   // uv = gl_FragCoord.xy / min(u_resolution.x, u_resolution.y);
-  // // uv -= vec2(0.25,0.25);
-  // uv  = repeat(uv, vec2(5.0, 5.0));
-  // float l = clamp(sin(u_time) * 2.0, 0.2, 1.0);
-  // float c2 = square(uv, vec2(l));
+  // // uv *= rot2(0.785);
 
-  // float cc = min(c,c2);
+  // uv -= vec2((u_time * 0.02),(u_time * 0.02));
+  // uv  = repeat(uv, vec2(4.0, 4.0));
+  // // float l = clamp(sin(u_time) * 2.0, 0.2, 1.0);
+  // float c2 = square(uv, vec2(0.2));
 
-  // c = aastep(0.025, cc);
+  // float cc = max(c,c2);
+
+  c = aastep(0.025, c);
 
   vec3 color = mix(vec3(0.0,0.0,0.0), vec3(1.0,1.0,1.0), c);
   gl_FragColor = vec4(color, 1.0);
