@@ -23,6 +23,10 @@ mat2 rot2(float r){
 
 float square(in vec2 st, vec2 dm) {
 
+    // Drawing a square is a bit trickier than a circle. We ignore everything
+    // outside of the bottom left, then everything outside of the top right.
+    // This gives us the rectangular area in the middle.
+
     vec2 bl = step(0.5 - dm / 2.0, st);
     float pct = bl.x * bl.y;
 
@@ -49,20 +53,7 @@ void main(void)
   uv  = repeat(uv, vec2(4.0, 4.0));
   float x = 0.7;
   float y = 0.7; // + (sin(u_time) * 0.2);
-  float c1 = square(uv, vec2(x, y));
-
-  // uv = gl_FragCoord.xy / min(u_resolution.x, u_resolution.y);
-  // uv -= vec2(u_time * 0.1, u_time * 0.1);
-  // uv *= rot2(cos(u_time) * 0.001);
-  // uv  = repeat(uv, vec2(4.0, 4.0));
-  // // float l = clamp(sin(u_time) * 2.0, 0.2, 1.0);
-  // float c2 = circle(uv, 0.1);
-  // c2 = smoothstep(c2, 0.1, 0.15);
-  // c2 = step(0.1, c2);
-
-  float c = c1; //max(c1, c2);
-
-  // c = aastep(0.01, c);
+  float c = square(uv, vec2(x, y));
 
   vec3 color = mix(vec3(0.0,0.0,0.0), vec3(1.0,1.0,1.0), c);
   gl_FragColor = vec4(color, 1.0);
